@@ -1,0 +1,1 @@
+include ':app', ':receiver_annotation', ':receiver_api', ':receive_test', ':transmission'
