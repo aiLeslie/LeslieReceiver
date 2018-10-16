@@ -1,7 +1,6 @@
 package com.leslie.receiver_api;
 
 import android.app.Activity;
-import android.content.Context;
 
 import com.leslie.receiver_annotation.Action;
 import com.leslie.receiver_annotation.OnReceive;
@@ -21,6 +20,30 @@ public class ReceiverBinder {
 
         initReceiver(receiver);
 
+    }
+
+    private static <A extends Activity> MyReceiver isExistsReceiver(A activity) {
+
+        MyReceiver receiver = null;
+
+        Class<? extends Activity> aClass = activity.getClass();
+
+        Field[] fields = aClass.getDeclaredFields();
+
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Receiver.class)) {
+
+                try {
+                    receiver = new MyReceiver(activity);
+                    // 注入Receiver对象
+                    field.setAccessible(true);
+                    field.set(activity, receiver);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return receiver;
     }
 
     private static <A extends Activity> void initReceiver(MyReceiver receiver) {
@@ -53,29 +76,7 @@ public class ReceiverBinder {
     }
 
 
-    private static <A extends Activity> MyReceiver isExistsReceiver(A activity) {
 
-        MyReceiver receiver = null;
-
-        Class<? extends Activity> aClass = activity.getClass();
-
-        Field[] fields = aClass.getDeclaredFields();
-
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Receiver.class)) {
-
-                try {
-                    receiver = new MyReceiver(activity);
-                    // 注入Receiver对象
-                    field.setAccessible(true);
-                    field.set(activity, receiver);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return receiver;
-    }
 
 
 }

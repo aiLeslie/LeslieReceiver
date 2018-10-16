@@ -1,8 +1,8 @@
 package com.leslie.receiver_api.receiver;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-
 
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,23 +25,29 @@ public class MyReceiver extends LeslieReceiver {
 
     /**
      * 处理Intent
+     *
      * @param intent
      */
-    private void handleIntent(Intent intent) {
-        String action = intent.getAction();
+    private void handleIntent(final Intent intent) {
+        final String action = intent.getAction();
         if (!methods.containsKey(action)) {
             return;
         }
 
 
-        try {
-            Method method = methods.get(action);
-            method.invoke(mContext,new Object[]{intent});
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        ((Activity) mContext).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Method method = methods.get(action);
+                try {
+                    method.invoke(mContext, new Object[]{intent});
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 
